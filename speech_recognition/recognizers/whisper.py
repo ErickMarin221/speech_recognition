@@ -5,6 +5,7 @@ from io import BytesIO
 
 from speech_recognition.audio import AudioData
 from speech_recognition.exceptions import SetupError
+from openai import OpenAI
 
 
 def recognize_whisper_api(
@@ -38,5 +39,10 @@ def recognize_whisper_api(
     wav_data = BytesIO(audio_data.get_wav_data())
     wav_data.name = "SpeechRecognition_audio.wav"
 
-    transcript = openai.Audio.transcribe(model, wav_data, api_key=api_key)
-    return transcript["text"]
+    client = OpenAI(api_key=api_key)
+    transcript = client.audio.transcriptions.create(
+        model="whisper-1",
+        file=wav_data,
+        response_format="text")
+
+    return transcript
